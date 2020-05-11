@@ -15,17 +15,13 @@
  */
 
 /**
- * External dependencies
- */
-import { useContext } from 'react';
-
-/**
  * Internal dependencies
  */
+import { identity, useContextSelector } from '../../utils/context';
 import Context from './context';
 
-function useSidebar() {
-  return useContext(Context);
+function useSidebar(selector) {
+  return useContextSelector(Context, selector ?? identity);
 }
 
 export default useSidebar;
