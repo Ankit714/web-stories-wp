@@ -130,16 +130,44 @@ const PREVIEW_SIZE = 150;
 
 function MediaPane(props) {
   const {
-    state: {
-      hasMore,
-      media,
-      isMediaLoading,
-      isMediaLoaded,
-      mediaType,
-      searchTerm,
-    },
-    actions: { setNextPage, resetWithFetch, setMediaType, setSearchTerm },
-  } = useMedia();
+    hasMore,
+    media,
+    isMediaLoading,
+    isMediaLoaded,
+    mediaType,
+    searchTerm,
+    setNextPage,
+    resetWithFetch,
+    setMediaType,
+    setSearchTerm,
+  } = useMedia(
+    ({
+      /* eslint-disable no-shadow */
+      state: {
+        hasMore,
+        media,
+        isMediaLoading,
+        isMediaLoaded,
+        mediaType,
+        searchTerm,
+      },
+      actions: { setNextPage, resetWithFetch, setMediaType, setSearchTerm },
+      /* eslint-enable no-shadow */
+    }) => {
+      return {
+        hasMore,
+        media,
+        isMediaLoading,
+        isMediaLoaded,
+        mediaType,
+        searchTerm,
+        setNextPage,
+        resetWithFetch,
+        setMediaType,
+        setSearchTerm,
+      };
+    }
+  );
 
   const {
     allowedMimeTypes: {
@@ -148,9 +176,9 @@ function MediaPane(props) {
     },
   } = useConfig();
 
-  const {
-    actions: { insertElement },
-  } = useLibrary();
+  const { insertElement } = useLibrary((state) => ({
+    insertElement: state.actions.insertElement,
+  }));
 
   const onClose = resetWithFetch;
 

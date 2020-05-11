@@ -50,13 +50,17 @@ const AddColorPreset = styled.button`
 `;
 
 function ColorPresetActions({ color }) {
-  const {
-    state: {
-      selectedElements,
-      story: { stylePresets },
-    },
-    actions: { updateStory },
-  } = useStory();
+  const { selectedElements, stylePresets, updateStory } = useStory(
+    ({
+      /* eslint-disable no-shadow */
+      state: {
+        selectedElements,
+        story: { stylePresets },
+      },
+      actions: { updateStory },
+      /* eslint-enable no-shadow */
+    }) => ({ selectedElements, stylePresets, updateStory })
+  );
 
   const { fillColors, textColors } = stylePresets;
 

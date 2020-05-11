@@ -54,13 +54,17 @@ const Space = styled.div`
 `;
 
 function PreviewButton() {
-  const {
-    state: {
-      meta: { isSaving },
-      story: { link, status },
-    },
-    actions: { autoSave, saveStory },
-  } = useStory();
+  const { isSaving, link, status, autoSave, saveStory } = useStory(
+    ({
+      /* eslint-disable no-shadow */
+      state: {
+        meta: { isSaving },
+        story: { link, status },
+      },
+      actions: { autoSave, saveStory },
+      /* eslint-enable no-shadow */
+    }) => ({ isSaving, link, status, autoSave, saveStory })
+  );
   const { previewLink: autoSaveLink } = useConfig();
 
   const [previewLinkToOpenViaDialog, setPreviewLinkToOpenViaDialog] = useState(
@@ -161,16 +165,20 @@ function PreviewButton() {
 }
 
 function Publish() {
-  const {
-    state: {
-      meta: { isSaving },
-      story: { date, storyId },
-    },
-    actions: { saveStory },
-  } = useStory();
-  const {
-    state: { isUploading },
-  } = useMedia();
+  const { isSaving, date, storyId, saveStory } = useStory(
+    ({
+      /* eslint-disable no-shadow */
+      state: {
+        meta: { isSaving },
+        story: { date, storyId },
+      },
+      actions: { saveStory },
+      /* eslint-enable no-shadow */
+    }) => ({ isSaving, date, storyId, saveStory })
+  );
+  const { isUploading } = useMedia((state) => ({
+    isUploading: state.actions.isUploading,
+  }));
 
   const refreshPostEditURL = useRefreshPostEditURL(storyId);
   const hasFutureDate = Date.now() < Date.parse(date);
@@ -191,15 +199,19 @@ function Publish() {
 }
 
 function SwitchToDraft() {
-  const {
-    state: {
-      meta: { isSaving },
-    },
-    actions: { saveStory },
-  } = useStory();
-  const {
-    state: { isUploading },
-  } = useMedia();
+  const { isSaving, saveStory } = useStory(
+    ({
+      state: {
+        // eslint-disable-next-line no-shadow
+        meta: { isSaving },
+      },
+      // eslint-disable-next-line no-shadow
+      actions: { saveStory },
+    }) => ({ isSaving, saveStory })
+  );
+  const { isUploading } = useMedia((state) => ({
+    isUploading: state.state.isUploading,
+  }));
 
   const handleUnPublish = useCallback(() => saveStory({ status: 'draft' }), [
     saveStory,
@@ -213,16 +225,20 @@ function SwitchToDraft() {
 }
 
 function Update() {
-  const {
-    state: {
-      meta: { isSaving },
-      story: { status },
-    },
-    actions: { saveStory },
-  } = useStory();
-  const {
-    state: { isUploading },
-  } = useMedia();
+  const { isSaving, status, saveStory } = useStory(
+    ({
+      /* eslint-disable no-shadow */
+      state: {
+        meta: { isSaving },
+        story: { status },
+      },
+      actions: { saveStory },
+      /* eslint-enable no-shadow */
+    }) => ({ isSaving, status, saveStory })
+  );
+  const { isUploading } = useMedia((state) => ({
+    isUploading: state.state.isUploading,
+  }));
   const {
     state: { hasNewChanges },
   } = useHistory();
@@ -256,11 +272,9 @@ function Update() {
 }
 
 function Loading() {
-  const {
-    state: {
-      meta: { isSaving },
-    },
-  } = useStory();
+  const { isSaving } = useStory((state) => ({
+    isSaving: state.state.meta.isSaving,
+  }));
   return (
     <>
       {isSaving && <CircularProgress size={30} />}
@@ -270,11 +284,9 @@ function Loading() {
 }
 
 function Buttons() {
-  const {
-    state: {
-      story: { status },
-    },
-  } = useStory();
+  const { status } = useStory((state) => ({
+    status: state.state.story.status,
+  }));
   const isDraft = 'draft' === status;
   return (
     <ButtonList>

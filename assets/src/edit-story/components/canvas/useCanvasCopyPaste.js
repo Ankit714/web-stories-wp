@@ -35,9 +35,25 @@ import useUploadWithPreview from './useUploadWithPreview';
 
 function useCanvasGlobalKeys() {
   const {
-    state: { currentPage, selectedElements },
-    actions: { addElements, deleteSelectedElements },
-  } = useStory();
+    currentPage,
+    selectedElements,
+    addElements,
+    deleteSelectedElements,
+  } = useStory(
+    ({
+      /* eslint-disable no-shadow */
+      state: { currentPage, selectedElements },
+      actions: { addElements, deleteSelectedElements },
+      /* eslint-enable no-shadow */
+    }) => {
+      return {
+        currentPage,
+        selectedElements,
+        addElements,
+        deleteSelectedElements,
+      };
+    }
+  );
 
   const uploadWithPreview = useUploadWithPreview();
 

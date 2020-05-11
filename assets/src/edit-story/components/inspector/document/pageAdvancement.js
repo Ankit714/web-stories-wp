@@ -50,15 +50,19 @@ const MIN_PAGE_DURATION = 1;
 const MAX_PAGE_DURATION = 20;
 
 function PageAdvancementPanel() {
-  const {
-    state: {
-      story: {
-        autoAdvance = DEFAULT_AUTO_ADVANCE,
-        defaultPageDuration = DEFAULT_PAGE_DURATION,
+  const { autoAdvance, defaultPageDuration, updateStory } = useStory(
+    ({
+      /* eslint-disable no-shadow */
+      state: {
+        story: {
+          autoAdvance = DEFAULT_AUTO_ADVANCE,
+          defaultPageDuration = DEFAULT_PAGE_DURATION,
+        },
       },
-    },
-    actions: { updateStory },
-  } = useStory();
+      actions: { updateStory },
+      /* eslint-enable no-shadow */
+    }) => ({ autoAdvance, defaultPageDuration, updateStory })
+  );
 
   const [duration, setDuration] = useState(defaultPageDuration);
 
