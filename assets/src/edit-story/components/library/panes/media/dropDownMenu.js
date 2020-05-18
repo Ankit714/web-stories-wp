@@ -19,7 +19,7 @@
  */
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -54,7 +54,11 @@ function DropDownMenu({ pointerEntered, isMenuOpen, setIsMenuOpen }) {
     { name: __('Delete', 'web-stories'), value: 'delete' },
   ];
 
-  const moreButtonRef = useRef();
+  const moreRef = useRef();
+
+  const onClickMoreIcon = useCallback(() => {
+    setIsMenuOpen(true);
+  }, [setIsMenuOpen]);
 
   const handleCurrentValue = (value) => {
     setIsMenuOpen(false);
@@ -70,24 +74,29 @@ function DropDownMenu({ pointerEntered, isMenuOpen, setIsMenuOpen }) {
     }
   };
 
+  // On menu losing focus.
+  const toggleOptions = useCallback(() => {
+    setIsMenuOpen(false);
+  }, [setIsMenuOpen]);
+
   // Keep icon and menu displayed if menu is open (even if user's mouse leaves the area).
   return (
     (pointerEntered || isMenuOpen) && (
       <>
         <MoreButton
-          ref={moreButtonRef}
+          ref={moreRef}
           width="28"
           height="28"
-          onClick={() => setIsMenuOpen(true)}
+          onClick={onClickMoreIcon}
           aria-pressed={isMenuOpen}
           aria-haspopup={true}
           aria-expanded={isMenuOpen}
         />
-        <Popup anchor={moreButtonRef} isOpen={isMenuOpen} width={160}>
+        <Popup anchor={moreRef} isOpen={isMenuOpen} width={160}>
           <DropDownList
             handleCurrentValue={handleCurrentValue}
             options={options}
-            toggleOptions={() => setIsMenuOpen(false)} // On menu losing focus.
+            toggleOptions={toggleOptions}
           />
         </Popup>
       </>
