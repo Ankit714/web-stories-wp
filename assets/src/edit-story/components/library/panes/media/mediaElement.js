@@ -187,20 +187,26 @@ const MediaElement = ({
   }, [setPointerEntered]);
 
   useEffect(() => {
-    if (type === 'video' && mediaElement.current) {
+    if (type === 'video') {
       if (isMenuOpen) {
-        // If it's a video, pause the preview while the dropdown menu is open.
-        mediaElement.current.pause();
+        if (mediaElement.current && !mediaElement.current.paused) {
+          // If it's a video, pause the preview while the dropdown menu is open.
+          mediaElement.current.pause();
+        }
       } else {
         if (pointerEntered) {
-          setShowVideoDetail(false); // TODO(jo): don't need media.current check for this.
-          // Pointer still in the media element, continue the video.
-          mediaElement.current.play();
+          setShowVideoDetail(false);
+          if (mediaElement.current) {
+            // Pointer still in the media element, continue the video.
+            mediaElement.current.play();
+          }
         } else {
-          setShowVideoDetail(true); // TODO(jo): don't need media.current check for this.
-          // Stop video and reset position.
-          mediaElement.current.pause();
-          mediaElement.current.currentTime = 0;
+          setShowVideoDetail(true);
+          if (mediaElement.current) {
+            // Stop video and reset position.
+            mediaElement.current.pause();
+            mediaElement.current.currentTime = 0;
+          }
         }
       }
     }
