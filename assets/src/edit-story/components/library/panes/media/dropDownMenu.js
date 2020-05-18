@@ -19,7 +19,7 @@
  */
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -44,26 +44,24 @@ const MoreButton = styled(More)`
  *
  * @param {Object} props Component props.
  * @param {boolean} props.pointerEntered If the user's pointer is in the media element.
- * @param {function(boolean)} props.menuCallback Callback for when menu is opened / closed.
+ * @param {boolean} props.isMenuOpen If the dropdown menu is open.
+ * @param {function(boolean)} props.setIsMenuOpen Callback for when menu is opened / closed.
  * @return {null|*} Element or null if should not display the More icon.
  */
-function DropDownMenu({ pointerEntered, menuCallback }) {
+function DropDownMenu({ pointerEntered, isMenuOpen, setIsMenuOpen }) {
   const options = [
     { name: __('Edit', 'web-stories'), value: 'edit' },
     { name: __('Delete', 'web-stories'), value: 'delete' },
   ];
 
-  const [showMenu, setShowMenu] = useState(false);
   const moreRef = useRef();
 
   const onClickMoreIcon = () => {
-    setShowMenu(true);
-    menuCallback(true);
+    setIsMenuOpen(true);
   };
 
   const handleCurrentValue = (value) => {
-    setShowMenu(false);
-    menuCallback(false);
+    setIsMenuOpen(false);
     switch (value) {
       case 'edit':
         // TODO(#354): Edit Media Metadata via Media Library Hover Menu
@@ -78,24 +76,23 @@ function DropDownMenu({ pointerEntered, menuCallback }) {
 
   // On menu losing focus.
   const toggleOptions = () => {
-    setShowMenu(false);
-    menuCallback(false);
+    setIsMenuOpen(false);
   };
 
   // Keep icon and menu displayed if menu is open (even if user's mouse leaves the area).
   return (
-    (pointerEntered || showMenu) && (
+    (pointerEntered || isMenuOpen) && (
       <>
         <MoreButton
           ref={moreRef}
           width="28"
           height="28"
           onClick={onClickMoreIcon}
-          aria-pressed={showMenu}
+          aria-pressed={isMenuOpen}
           aria-haspopup={true}
-          aria-expanded={showMenu}
+          aria-expanded={isMenuOpen}
         />
-        <Popup anchor={moreRef} isOpen={showMenu} width={160}>
+        <Popup anchor={moreRef} isOpen={isMenuOpen} width={160}>
           <DropDownList
             handleCurrentValue={handleCurrentValue}
             options={options}
@@ -109,7 +106,8 @@ function DropDownMenu({ pointerEntered, menuCallback }) {
 
 DropDownMenu.propTypes = {
   pointerEntered: PropTypes.bool,
-  menuCallback: PropTypes.func,
+  isMenuOpen: PropTypes.bool,
+  setIsMenuOpen: PropTypes.func,
 };
 
 export default DropDownMenu;

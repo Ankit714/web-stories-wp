@@ -19,7 +19,7 @@
  */
 import styled, { keyframes, css } from 'styled-components';
 import PropTypes from 'prop-types';
-import { useCallback, memo, useState, useRef, useMemo } from 'react';
+import { useEffect, useCallback, memo, useState, useRef, useMemo } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import { rgba } from 'polished';
 
@@ -137,6 +137,7 @@ const MediaElement = ({
   const mediaElement = useRef();
   const [showVideoDetail, setShowVideoDetail] = useState(true);
   const [pointerEntered, setPointerEntered] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const {
     actions: { handleDrag, handleDrop, setDraggingResource },
@@ -179,44 +180,33 @@ const MediaElement = ({
     // Currently we don't have feature flags (#1464) so this is a simple way to keep this feature
     // hidden until fully implemented.
     setPointerEntered(true);
-
-    if (type === 'video') {
-      setShowVideoDetail(false);
-      if (mediaElement.current) {
-        mediaElement.current.play();
-      }
-    }
-  }, [type]);
+  }, [setPointerEntered]);
 
   const onPointerLeave = useCallback(() => {
     setPointerEntered(false);
+  }, [setPointerEntered]);
 
-    if (type === 'video') {
-      setShowVideoDetail(true);
-      if (mediaElement.current) {
-        mediaElement.current.pause();
-        mediaElement.current.currentTime = 0;
-      }
-    }
-  }, [type]);
-
-  const onClick = () => onInsert(resource, width, height);
-
-  /// Callback for when the More dropdown menu has been opened / closed.
-  const menuCallback = (isMenuOpen) => {
+  useEffect(() => {
     if (type === 'video' && mediaElement.current) {
       if (isMenuOpen) {
         // If it's a video, pause the preview while the dropdown menu is open.
         mediaElement.current.pause();
-        // mediaElement.current.currentTime = 0;
       } else {
         if (pointerEntered) {
+          setShowVideoDetail(false); // TODO(jo): don't need media.current check for this.
           // Pointer still in the media element, continue the video.
           mediaElement.current.play();
+        } else {
+          setShowVideoDetail(true); // TODO(jo): don't need media.current check for this.
+          // Stop video and reset position.
+          mediaElement.current.pause();
+          mediaElement.current.currentTime = 0;
         }
       }
     }
-  };
+  }, [isMenuOpen, pointerEntered, type]);
+
+  const onClick = () => onInsert(resource, width, height);
 
   if (type === 'image') {
     let imageSrc = src;
@@ -260,7 +250,8 @@ const MediaElement = ({
         )}
         <DropDownMenu
           pointerEntered={pointerEntered}
-          menuCallback={menuCallback}
+          isMenuOpen={isMenuOpen}
+          setIsMenuOpen={setIsMenuOpen}
         />
       </Container>
     );
@@ -296,7 +287,8 @@ const MediaElement = ({
       )}
       <DropDownMenu
         pointerEntered={pointerEntered}
-        menuCallback={menuCallback}
+        isMenuOpen={isMenuOpen}
+        setIsMenuOpen={setIsMenuOpen}
       />
     </Container>
   );
