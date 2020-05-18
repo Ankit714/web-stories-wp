@@ -19,7 +19,7 @@
  */
 import styled, { keyframes, css } from 'styled-components';
 import PropTypes from 'prop-types';
-import { memo, useState, useRef, useMemo } from 'react';
+import { useCallback, memo, useState, useRef, useMemo } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import { rgba } from 'polished';
 
@@ -136,7 +136,7 @@ const MediaElement = ({
 
   const mediaElement = useRef();
   const [showVideoDetail, setShowVideoDetail] = useState(true);
-  const [showMoreIcon, setShowMoreIcon] = useState(false);
+  const [pointerEntered, setPointerEntered] = useState(false);
 
   const {
     actions: { handleDrag, handleDrop, setDraggingResource },
@@ -174,26 +174,51 @@ const MediaElement = ({
     [setDraggingResource, resource, handleDrag, handleDrop]
   );
 
+  const onPointerEnter = useCallback(() => {
+    // TODO: Set to `true` when Edit and Delete have been fully implemented and merged.
+    // Currently we don't have feature flags (#1464) so this is a simple way to keep this feature
+    // hidden until fully implemented.
+    setPointerEntered(true);
+
+    if (type === 'video') {
+      setShowVideoDetail(false);
+      if (mediaElement.current) {
+        mediaElement.current.play();
+      }
+    }
+  }, [type]);
+
+  const onPointerLeave = useCallback(() => {
+    setPointerEntered(false);
+
+    if (type === 'video') {
+      setShowVideoDetail(true);
+      if (mediaElement.current) {
+        mediaElement.current.pause();
+        mediaElement.current.currentTime = 0;
+      }
+    }
+  }, [type]);
+
   const onClick = () => onInsert(resource, width, height);
 
   /// Callback for when the More dropdown menu has been opened / closed.
   const menuCallback = (isMenuOpen) => {
-    if (isMenuOpen && type === 'video' && mediaElement.current) {
-      // If it's a video, pause the preview while the dropdown menu is open.
-      mediaElement.current.pause();
-      mediaElement.current.currentTime = 0;
-    } else if (!isMenuOpen) {
-      setShowMoreIcon(false);
+    if (type === 'video' && mediaElement.current) {
+      if (isMenuOpen) {
+        // If it's a video, pause the preview while the dropdown menu is open.
+        mediaElement.current.pause();
+        // mediaElement.current.currentTime = 0;
+      } else {
+        if (pointerEntered) {
+          // Pointer still in the media element, continue the video.
+          mediaElement.current.play();
+        }
+      }
     }
   };
 
   if (type === 'image') {
-    // TODO: Set to `true` when Edit and Delete have been fully implemented and merged.
-    // Currently we don't have feature flags (#1464) so this is a simple way to keep this feature
-    // hidden until fully implemented.
-    const onPointerEnterImage = () => setShowMoreIcon(false);
-    const onPointerLeaveImage = () => setShowMoreIcon(false);
-
     let imageSrc = src;
     if (sizes) {
       const { web_stories_thumbnail: webStoriesThumbnail, large, full } = sizes;
@@ -209,8 +234,8 @@ const MediaElement = ({
       <Container
         data-testid="mediaElement"
         data-id={resourceId}
-        onPointerEnter={onPointerEnterImage}
-        onPointerLeave={onPointerLeaveImage}
+        onPointerEnter={onPointerEnter}
+        onPointerLeave={onPointerLeave}
       >
         <Image
           key={src}
@@ -234,39 +259,16 @@ const MediaElement = ({
           </CSSTransition>
         )}
         <DropDownMenu
-          showDisplayIcon={showMoreIcon}
+          pointerEntered={pointerEntered}
           menuCallback={menuCallback}
         />
       </Container>
     );
   }
 
-  const onPointerEnterVideo = () => {
-    setShowVideoDetail(false);
-    if (mediaElement.current) {
-      mediaElement.current.play();
-    }
-    // TODO: Set to `true` when Edit and Delete have been fully implemented and merged.
-    // Currently we don't have feature flags (#1464) so this is a simple way to keep this feature
-    // hidden until fully implemented.
-    setShowMoreIcon(false);
-  };
-
-  const onPointerLeaveVideo = () => {
-    setShowVideoDetail(true);
-    if (mediaElement.current) {
-      mediaElement.current.pause();
-      mediaElement.current.currentTime = 0;
-    }
-    setShowMoreIcon(false);
-  };
-
   const { lengthFormatted, poster, mimeType } = resource;
   return (
-    <Container
-      onPointerEnter={onPointerEnterVideo}
-      onPointerLeave={onPointerLeaveVideo}
-    >
+    <Container onPointerEnter={onPointerEnter} onPointerLeave={onPointerLeave}>
       <Video
         key={src}
         ref={mediaElement}
@@ -293,7 +295,7 @@ const MediaElement = ({
         </CSSTransition>
       )}
       <DropDownMenu
-        showDisplayIcon={showMoreIcon}
+        pointerEntered={pointerEntered}
         menuCallback={menuCallback}
       />
     </Container>
