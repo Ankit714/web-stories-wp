@@ -18,11 +18,19 @@
  * External dependencies
  */
 import { object } from '@storybook/addon-knobs';
+import styled from 'styled-components';
 
 /**
  * Internal dependencies
  */
 import MediaElement from '../mediaElement';
+import testImage from './test-image.jpg';
+import testPoster from './test-poster.png';
+import testVideo from './test-video.mp4';
+
+const Column = styled.div`
+  width: 150px;
+`;
 
 export default {
   title: 'Stories Editor/Components/Media Element',
@@ -33,21 +41,18 @@ export const _Image = () => {
   const resource = object('Image Resource', {
     type: 'image',
     mimeType: 'image/png',
-    src: 'https://placehold.it/350x150',
-    width: 350,
-    height: 150,
+    src: testImage,
+    width: 910,
+    height: 675,
     local: false,
     alt: 'my image',
     sizes: {},
   });
 
   return (
-    <MediaElement
-      resource={resource}
-      width={150}
-      height={150}
-      onInsert={() => {}}
-    />
+    <Column>
+      <MediaElement resource={resource} width={150} onInsert={() => {}} />
+    </Column>
   );
 };
 
@@ -55,20 +60,19 @@ export const _Video = () => {
   const resource = object('Video Resource', {
     type: 'video',
     mimeType: 'video/mp4',
-    src: 'https://placehold.it/350x150',
-    width: 350,
-    height: 150,
+    src: testVideo,
+    width: 640,
+    height: 480,
+    poster: testPoster,
+    lengthFormatted: '0:26',
     local: false,
     alt: 'my video',
     sizes: {},
   });
 
   return (
-    <MediaElement
-      resource={resource}
-      width={150}
-      height={150}
-      onInsert={() => {}}
-    />
+    <Column>
+      <MediaElement resource={resource} width={150} onInsert={() => {}} />
+    </Column>
   );
 };
