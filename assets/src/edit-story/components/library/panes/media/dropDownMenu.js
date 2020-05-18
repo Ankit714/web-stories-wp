@@ -54,7 +54,7 @@ function DropDownMenu({ pointerEntered, isMenuOpen, setIsMenuOpen }) {
     { name: __('Delete', 'web-stories'), value: 'delete' },
   ];
 
-  const moreRef = useRef();
+  const moreButtonRef = useRef();
 
   const onClickMoreIcon = useCallback(() => {
     setIsMenuOpen(true);
@@ -81,10 +81,14 @@ function DropDownMenu({ pointerEntered, isMenuOpen, setIsMenuOpen }) {
 
   // Keep icon and menu displayed if menu is open (even if user's mouse leaves the area).
   return (
+    // TODO: Remove `false &&` when Edit and Delete have been fully implemented and merged.
+    // Currently we don't have feature flags (#1464) so this is a simple way to keep this feature
+    // hidden until fully implemented.
+    false &&
     (pointerEntered || isMenuOpen) && (
       <>
         <MoreButton
-          ref={moreRef}
+          ref={moreButtonRef}
           width="28"
           height="28"
           onClick={onClickMoreIcon}
@@ -92,7 +96,7 @@ function DropDownMenu({ pointerEntered, isMenuOpen, setIsMenuOpen }) {
           aria-haspopup={true}
           aria-expanded={isMenuOpen}
         />
-        <Popup anchor={moreRef} isOpen={isMenuOpen} width={160}>
+        <Popup anchor={moreButtonRef} isOpen={isMenuOpen} width={160}>
           <DropDownList
             handleCurrentValue={handleCurrentValue}
             options={options}

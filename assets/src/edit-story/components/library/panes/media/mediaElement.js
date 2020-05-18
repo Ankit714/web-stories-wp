@@ -176,9 +176,6 @@ const MediaElement = ({
   );
 
   const onPointerEnter = useCallback(() => {
-    // TODO: Set to `true` when Edit and Delete have been fully implemented and merged.
-    // Currently we don't have feature flags (#1464) so this is a simple way to keep this feature
-    // hidden until fully implemented.
     setPointerEntered(true);
   }, []);
 
