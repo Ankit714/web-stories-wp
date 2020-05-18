@@ -54,11 +54,7 @@ function DropDownMenu({ pointerEntered, isMenuOpen, setIsMenuOpen }) {
     { name: __('Delete', 'web-stories'), value: 'delete' },
   ];
 
-  const moreRef = useRef();
-
-  const onClickMoreIcon = () => {
-    setIsMenuOpen(true);
-  };
+  const moreButtonRef = useRef();
 
   const handleCurrentValue = (value) => {
     setIsMenuOpen(false);
@@ -74,29 +70,24 @@ function DropDownMenu({ pointerEntered, isMenuOpen, setIsMenuOpen }) {
     }
   };
 
-  // On menu losing focus.
-  const toggleOptions = () => {
-    setIsMenuOpen(false);
-  };
-
   // Keep icon and menu displayed if menu is open (even if user's mouse leaves the area).
   return (
     (pointerEntered || isMenuOpen) && (
       <>
         <MoreButton
-          ref={moreRef}
+          ref={moreButtonRef}
           width="28"
           height="28"
-          onClick={onClickMoreIcon}
+          onClick={() => setIsMenuOpen(true)}
           aria-pressed={isMenuOpen}
           aria-haspopup={true}
           aria-expanded={isMenuOpen}
         />
-        <Popup anchor={moreRef} isOpen={isMenuOpen} width={160}>
+        <Popup anchor={moreButtonRef} isOpen={isMenuOpen} width={160}>
           <DropDownList
             handleCurrentValue={handleCurrentValue}
             options={options}
-            toggleOptions={toggleOptions}
+            toggleOptions={() => setIsMenuOpen(false)} // On menu losing focus.
           />
         </Popup>
       </>

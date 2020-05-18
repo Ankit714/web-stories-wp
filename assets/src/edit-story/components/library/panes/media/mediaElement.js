@@ -180,11 +180,15 @@ const MediaElement = ({
     // Currently we don't have feature flags (#1464) so this is a simple way to keep this feature
     // hidden until fully implemented.
     setPointerEntered(true);
-  }, [setPointerEntered]);
+  }, []);
 
   const onPointerLeave = useCallback(() => {
     setPointerEntered(false);
-  }, [setPointerEntered]);
+  }, []);
+
+  const menuCallback = useCallback((isOpen) => {
+    setIsMenuOpen(isOpen);
+  }, []);
 
   useEffect(() => {
     if (type === 'video') {
@@ -257,7 +261,7 @@ const MediaElement = ({
         <DropDownMenu
           pointerEntered={pointerEntered}
           isMenuOpen={isMenuOpen}
-          setIsMenuOpen={setIsMenuOpen}
+          setIsMenuOpen={menuCallback}
         />
       </Container>
     );
@@ -294,7 +298,7 @@ const MediaElement = ({
       <DropDownMenu
         pointerEntered={pointerEntered}
         isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
+        setIsMenuOpen={menuCallback}
       />
     </Container>
   );
